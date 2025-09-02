@@ -1,4 +1,4 @@
-package co.com.crediya.loan.api;
+package co.com.crediya.loan.api.reactive_controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

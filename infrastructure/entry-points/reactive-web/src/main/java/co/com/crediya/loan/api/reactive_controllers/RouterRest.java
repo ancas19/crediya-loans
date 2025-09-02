@@ -1,4 +1,4 @@
-package co.com.crediya.loan.api;
+package co.com.crediya.loan.api.reactive_controllers;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

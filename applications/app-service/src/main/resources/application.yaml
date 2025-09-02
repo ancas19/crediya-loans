@@ -1,16 +1,24 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 spring:
   application:
-    name: "CrediyaLoans"
-  devtools:
-    add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
-  profiles:
-    include: null
+    name: "UsersCrediya"
+  webflux:
+    base-path: ${CONTEXT_PATH}
+adapters:
+  r2dbc:
+    host: ${R2DBC_HOST:localhost}
+    port: ${R2DBC_PORT:5432}
+    database: ${R2DBC_DATABASE:mydb}
+    schema: ${R2DBC_SCHEMA:public}
+    username: ${R2DBC_USERNAME:myuser}
+    password: ${R2DBC_PASSWORD:mypass}
+    poolSize: ${R2DBC_POOLSIZE:5}
+    maxSize: ${R2DBC_MAXSIZE:20}
+    maxIdleTime: ${R2DBC_MAXIDLETIME:10}
+    validationQuery: ${R2DBC_VALIDATIONQUERY:SELECT 1}
+
+
 management:
   endpoints:
     web:

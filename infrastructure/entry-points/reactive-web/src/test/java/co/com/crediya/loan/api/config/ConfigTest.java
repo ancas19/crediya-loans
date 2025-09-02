@@ -1,7 +1,7 @@
 package co.com.crediya.loan.api.config;
 
-import co.com.crediya.loan.api.Handler;
-import co.com.crediya.loan.api.RouterRest;
+import co.com.crediya.loan.api.reactive_controllers.Handler;
+import co.com.crediya.loan.api.reactive_controllers.RouterRest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
