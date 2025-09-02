@@ -1,8 +1,8 @@
 package co.com.crediya.loan.api.exceptions;
 
-import co.com.crediya.commons.enums.ErrorMessages;
-import co.com.crediya.commons.exception.BadRequestException;
-import co.com.crediya.commons.exception.NotFoundException;
+import co.com.crediya.loan.model.commons.enums.ErrorMessages;
+import co.com.crediya.loan.model.commons.exception.BadRequestException;
+import co.com.crediya.loan.model.commons.exception.NotFoundException;
 import co.com.crediya.loan.api.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

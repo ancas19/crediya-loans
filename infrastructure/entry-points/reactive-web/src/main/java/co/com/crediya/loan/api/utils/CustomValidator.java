@@ -1,6 +1,6 @@
 package co.com.crediya.loan.api.utils;
 
-import co.com.crediya.commons.exception.BadRequestException;
+import co.com.crediya.loan.model.commons.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;

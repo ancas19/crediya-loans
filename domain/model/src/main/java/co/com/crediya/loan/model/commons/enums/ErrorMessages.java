@@ -1,4 +1,4 @@
-package co.com.crediya.commons.enums;
+package co.com.crediya.loan.model.commons.enums;
 
 public enum ErrorMessages {
     ERROR_MESSAGE_GLOBAL_EXCEPTION("Internal server error, contact with support for help"),;

@@ -1,4 +1,4 @@
-package co.com.crediya.commons.models;
+package co.com.crediya.loan.model.commons.models;
 
 
 import lombok.AllArgsConstructor;

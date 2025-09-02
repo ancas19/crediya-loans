@@ -25,7 +25,7 @@ public class LoansEntity extends AbstractAuditoriaEntity{
     @Column("monto")
     private BigDecimal amount;
     @Column("plazo")
-    private BigDecimal term;
+    private Integer term;
     @Column("identification")
     private String identification;
     @Column("id_estado")
