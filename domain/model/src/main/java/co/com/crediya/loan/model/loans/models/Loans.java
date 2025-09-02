@@ -19,4 +19,6 @@ public class Loans extends AbstractAuditoria {
     private String identification;
     private UUID stateId;
     private UUID loanTypeId;
+    private String stateName;
+    private String loanTypeName;
 }
