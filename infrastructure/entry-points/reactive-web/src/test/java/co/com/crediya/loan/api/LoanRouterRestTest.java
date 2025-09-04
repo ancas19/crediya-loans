@@ -1,7 +1,7 @@
 package co.com.crediya.loan.api;
 
-import co.com.crediya.loan.api.reactive_controllers.Handler;
-import co.com.crediya.loan.api.reactive_controllers.RouterRest;
+import co.com.crediya.loan.api.reactive_controllers.LoansHandler;
+import co.com.crediya.loan.api.reactive_controllers.LoanRouterRest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class})
+@ContextConfiguration(classes = {LoanRouterRest.class, LoansHandler.class})
 @WebFluxTest
-class RouterRestTest {
+class LoanRouterRestTest {
 
     @Autowired
     private WebTestClient webTestClient;

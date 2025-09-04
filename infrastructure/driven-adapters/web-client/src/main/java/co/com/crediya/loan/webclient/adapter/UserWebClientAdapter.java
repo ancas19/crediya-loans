@@ -18,16 +18,17 @@ import static co.com.crediya.loan.model.commons.enums.ErrorMessages.ERROR_SEARCH
 @RequiredArgsConstructor
 public class UserWebClientAdapter implements UserWebClientRepository {
     public static final Logger log= LoggerFactory.getLogger(UserWebClientAdapter.class);
-    @Value("${user.service.url}")
+    @Value("${user.service.host}")
     private String userServiceUrl;
-    @Value("${user.service.endpoint}")
+    @Value("${user.service.uri}")
     private String userServiceEndpoint;
     private final WebClient webClient;
 
     @Override
     public Mono<UserInformation> getUserInformation(UserDocument userDocument) {
-        return webClient.get()
-                .uri(userServiceUrl + userServiceEndpoint, userDocument.getIdentification())
+        return webClient.post()
+                .uri(userServiceUrl + userServiceEndpoint)
+                .bodyValue(userDocument)
                 .retrieve()
                 .bodyToMono(UserInformation.class)
                 .doOnSuccess(userInfo -> log.info("User information retrieved: {}", userInfo))

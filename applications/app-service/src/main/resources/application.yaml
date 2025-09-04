@@ -18,6 +18,11 @@ adapters:
     maxIdleTime: ${R2DBC_MAXIDLETIME:10}
     validationQuery: ${R2DBC_VALIDATIONQUERY:SELECT 1}
 
+user:
+  service:
+    host: ${USER_SERVICE_HOST:localhost:8080}
+    uri: ${USER_SERVICE_URI:/api/v1/users}
+
 
 management:
   endpoints:

@@ -3,6 +3,7 @@ package co.com.crediya.loan.api.reactive_controllers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
@@ -10,11 +11,17 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-public class RouterRest {
+public class LoanRouterRest {
+    private final LoansHandler loansHandler;
+
+    public LoanRouterRest(LoansHandler loansHandler) {
+        this.loansHandler = loansHandler;
+    }
+
     @Bean
-    public RouterFunction<ServerResponse> routerFunction(Handler handler) {
-        return route(GET("/api/usecase/path"), handler::listenGETUseCase)
-                .andRoute(POST("/api/usecase/otherpath"), handler::listenPOSTUseCase)
-                .and(route(GET("/api/otherusercase/path"), handler::listenGETOtherUseCase));
+    public RouterFunction<ServerResponse> routerFunction() {
+        return RouterFunctions.route()
+                .POST("/solicitud",loansHandler::createLoan)
+                .build();
     }
 }
