@@ -5,8 +5,6 @@ import co.com.crediya.loan.jwt.filters.JwtAuthenticationFilter;
 import co.com.crediya.loan.usecase.token.TokenUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -33,17 +31,18 @@ public class WebSecurity {
     }
 
     @Bean
-    public SecurityWebFilterChain httpSecurityFilterChain(ServerHttpSecurity http, ReactiveAuthenticationManager authenticationManager, TokenUseCase jwtService) {
+    public SecurityWebFilterChain httpSecurityFilterChain(ServerHttpSecurity http,TokenUseCase jwtService) {
         Set<String> publicUrls = new HashSet<>(securityProperties.getPublicPaths());
         return http.authorizeExchange(
                         exchanges -> exchanges
+                                .pathMatchers("/solicitud").hasAnyRole("CLIENTE","ADMIN","ASESOR")
+                                .pathMatchers("/solicitud/detalles").hasAnyRole("ADMIN","ASESOR")
                                 .anyExchange()
                                 .authenticated()
                 )
                 .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .authenticationManager(authenticationManager)
                 .addFilterAt(new JwtAuthenticationFilter(jwtService,publicUrls), SecurityWebFiltersOrder.AUTHENTICATION)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .build();

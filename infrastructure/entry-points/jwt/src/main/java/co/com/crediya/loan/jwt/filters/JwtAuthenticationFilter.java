@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                             return chain
                                     .filter(exchange)
                                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
-                                    .contextWrite(context -> context.put("token", token));
+                                    .contextWrite(context -> context.put(AUTHORIZATION.getValue(), token));
                         }
                 );
     }

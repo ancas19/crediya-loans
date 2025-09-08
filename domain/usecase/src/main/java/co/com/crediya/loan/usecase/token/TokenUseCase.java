@@ -10,9 +10,6 @@ import java.util.Map;
 public class TokenUseCase {
     private final TokenPort tokenPort;
 
-    public Mono<String> generateToken(String subject, Map<String, String> claims) {
-        return tokenPort.generateToken(subject, claims);
-    }
     public Mono<Boolean> validateJwt(String token){
         return this.tokenPort.validateJwt(token);
     }

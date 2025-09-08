@@ -1,7 +1,10 @@
 package co.com.crediya.loan.r2dbc.adapters;
 
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
+import co.com.crediya.loan.model.loans.models.LoanSearch;
 import co.com.crediya.loan.model.loans.models.Loans;
+import co.com.crediya.loan.model.loans.models.LoansPaginated;
+import co.com.crediya.loan.r2dbc.custom_repositories.CustomuserRepository;
 import co.com.crediya.loan.r2dbc.entity.LoansEntity;
 import co.com.crediya.loan.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.crediya.loan.r2dbc.repository.LoansRepository;
@@ -12,8 +15,12 @@ import java.util.UUID;
 
 @Service
 public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loans, LoansEntity, UUID, LoansRepository> implements LoansRepositoryPort {
-    public LoanReactiveRepositoryAdapter(LoansRepository loansRepository, org.reactivecommons.utils.ObjectMapper objectMapper){
+
+    private final CustomuserRepository customuserRepository;
+
+    public LoanReactiveRepositoryAdapter(LoansRepository loansRepository, org.reactivecommons.utils.ObjectMapper objectMapper, CustomuserRepository customuserRepository){
         super(loansRepository,objectMapper,d->objectMapper.map(d, Loans.class));
+        this.customuserRepository = customuserRepository;
     }
 
 
@@ -21,5 +28,10 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
     public Mono<Loans> createLoan(Loans loanInformation) {
         return this.repository.save(toData(loanInformation))
                 .map(loanCreated -> mapper.map(loanCreated, Loans.class));
+    }
+
+    @Override
+    public Mono<LoansPaginated> searchLoans(LoanSearch loanSearch) {
+        return this.customuserRepository.searchLoans(loanSearch);
     }
 }

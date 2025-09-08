@@ -32,7 +32,7 @@ public class UserWebClientAdapter implements UserWebClientRepository {
         return this.getCurrentToken()
                 .flatMap(token -> webClient.post()
                         .uri(userServiceUrl + userServiceEndpoint)
-                        .header(HttpHeaders.AUTHORIZATION, BEARER.getValue().formatted(token))
+                        .header(HttpHeaders.AUTHORIZATION, BEARER.getValue()+(token))
                         .bodyValue(userDocument)
                         .retrieve()
                         .bodyToMono(UserInformation.class)

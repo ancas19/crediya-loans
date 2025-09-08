@@ -89,7 +89,7 @@ public class CustomExceptionhandler {
                         .status(HttpStatus.FORBIDDEN)
                         .body(new ErrorResponse(
                                 parseErrorMessages(ex.getMessage()),
-                                HttpStatus.UNAUTHORIZED.toString(),
+                                HttpStatus.FORBIDDEN.toString(),
                                 exchange.getRequest().getURI().toString(),
                                 LocalDateTime.now())
                         )
