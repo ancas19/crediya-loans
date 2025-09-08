@@ -19,6 +19,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static co.com.crediya.loan.model.commons.enums.Endpoints.CREATE_LOANS;
+import static co.com.crediya.loan.model.commons.enums.Endpoints.FIND_LOAN;
+import static co.com.crediya.loan.model.commons.enums.Roles.*;
+
 
 @Configuration
 @EnableWebFluxSecurity
@@ -35,8 +39,8 @@ public class WebSecurity {
         Set<String> publicUrls = new HashSet<>(securityProperties.getPublicPaths());
         return http.authorizeExchange(
                         exchanges -> exchanges
-                                .pathMatchers("/solicitud").hasAnyRole("CLIENTE","ADMIN","ASESOR")
-                                .pathMatchers("/solicitud/detalles").hasAnyRole("ADMIN","ASESOR")
+                                .pathMatchers(CREATE_LOANS.getValue()).hasAnyRole(CLIENTE.getValue(),ADMIN.getValue(),ASESOR.getValue())
+                                .pathMatchers(FIND_LOAN.getValue()).hasAnyRole(ADMIN.getValue(),ASESOR.getValue())
                                 .anyExchange()
                                 .authenticated()
                 )
