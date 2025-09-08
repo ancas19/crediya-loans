@@ -2,7 +2,13 @@ package co.com.crediya.loan.model.commons.enums;
 
 public enum Constants {
 
-    PENDING("PENDIENTE"),;
+    PENDING("PENDIENTE"),
+    AUTHORIZATION("Authorization"),
+    INACTIVE("INACTIVE"),
+    ROLE("ROLE_%s"),
+    CALIM_IDENTIFICATION("IDENTIFICATION"),
+    CLAIM_ROLE("ROLE"),
+    BEARER("Bearer ");
 
     private final String value;
 

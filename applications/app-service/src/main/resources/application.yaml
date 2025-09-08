@@ -24,6 +24,10 @@ user:
     uri: ${USER_SERVICE_URI:/api/v1/users}
 
 
+jwt:
+  secret: ${JWT_SECRET:secret}
+  expiration: ${JWT_TIME:8}
+
 management:
   endpoints:
     web:
@@ -35,3 +39,14 @@ management:
         enabled: true
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+security:
+  public-paths:
+    - POST:/api/v1.0/auth/login
+
+logging:
+  level:
+    reactor.netty: DEBUG
+    org.springframework.data.r2dbc: DEBUG
+    io.r2dbc.postgresql.QUERY: DEBUG
+    root: INFO

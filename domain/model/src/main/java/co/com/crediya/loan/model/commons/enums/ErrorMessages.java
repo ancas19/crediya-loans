@@ -5,7 +5,8 @@ public enum ErrorMessages {
     ERROR_SEARCHING_USER_INFORMATION("Error searching user information"),
     ERROR_STATE_NOT_FOUND("State with name %s not found"),
     ERROR_MESSAGE_LOAN_TYPE_NOT_FOUND("Loan type with name %s not found"),
-    ERROR_MESSAGE_USER_NOT_FOUND("User with identification %s not found"),;
+    ERROR_MESSAGE_USER_NOT_FOUND("User with identification %s not found"),
+    ERROR_MESSAGES_USER_CREATE_LOAN("A user cannot create a request loan for another user");
     private final String message;
 
     ErrorMessages(String message){

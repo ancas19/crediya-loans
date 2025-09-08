@@ -43,8 +43,7 @@ public class LoansUseCase {
                                 savedLoan.setIdentification(loanInformation.getIdentification());
                                 return savedLoan;
                             });
-                })
-                );
+                });
     }
 
 

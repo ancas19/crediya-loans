@@ -1,6 +1,7 @@
 package co.com.crediya.loan.api.exceptions;
 
 import co.com.crediya.loan.model.commons.enums.ErrorMessages;
+import co.com.crediya.loan.model.commons.exception.BadCredentialsException;
 import co.com.crediya.loan.model.commons.exception.BadRequestException;
 import co.com.crediya.loan.model.commons.exception.NotFoundException;
 import co.com.crediya.loan.api.response.ErrorResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -58,6 +60,36 @@ public class CustomExceptionhandler {
                         .body(  new ErrorResponse(
                                 List.of(ex.getMessage()),
                                 HttpStatus.NOT_FOUND.toString(),
+                                exchange.getRequest().getURI().toString(),
+                                LocalDateTime.now())
+                        )
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleBadCredentials(BadCredentialsException ex, ServerWebExchange exchange) {
+        log.error("Bad credential ", ex);
+        return Mono.just(
+                ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse(
+                                parseErrorMessages(ex.getMessage()),
+                                HttpStatus.UNAUTHORIZED.toString(),
+                                exchange.getRequest().getURI().toString(),
+                                LocalDateTime.now())
+                        )
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleAccessDeniedException(AccessDeniedException ex, ServerWebExchange exchange) {
+        log.error("Access denied ", ex);
+        return Mono.just(
+                ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(new ErrorResponse(
+                                parseErrorMessages(ex.getMessage()),
+                                HttpStatus.UNAUTHORIZED.toString(),
                                 exchange.getRequest().getURI().toString(),
                                 LocalDateTime.now())
                         )
