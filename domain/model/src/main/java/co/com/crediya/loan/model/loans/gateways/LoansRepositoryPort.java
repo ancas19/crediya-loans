@@ -7,6 +7,5 @@ import reactor.core.publisher.Mono;
 
 public interface LoansRepositoryPort {
     Mono<Loans> createLoan(Loans loanInformation);
-
     Mono<LoansPaginated> searchLoans(LoanSearch loanSearch);
 }

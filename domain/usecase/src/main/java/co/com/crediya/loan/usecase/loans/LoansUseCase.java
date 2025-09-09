@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,10 +90,24 @@ public class LoansUseCase {
                                             loan.setNames(userInformation.getNames());
                                             loan.setEmail(userInformation.getEmail());
                                             loan.setLastNames(userInformation.getLastName());
+                                            loan.setBaseSalary(userInformation.getBaseSalary());
+                                            loan.setMonthlyDebt(monthlyPayment(loan.getAmount(), loan.getInterestRate(), loan.getTerm()));
                                             return loan;
                                         }
                                 )
                                 .collectList()
                 );
+    }
+
+    private BigDecimal monthlyPayment(BigDecimal principal, BigDecimal annualInterestRate, int termInMonths) {
+        if (annualInterestRate.compareTo(BigDecimal.ZERO) == 0) {
+            return principal.divide(BigDecimal.valueOf(termInMonths), RoundingMode.HALF_UP);
+        }
+        BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(12L * 100L), 10, RoundingMode.HALF_UP);
+        BigDecimal onePlus = BigDecimal.ONE.add(monthlyInterestRate);
+        BigDecimal denominator = BigDecimal.ONE.subtract(onePlus.pow(-termInMonths, MathContext.DECIMAL128));
+        return principal
+                .multiply(monthlyInterestRate)
+                .divide(denominator, 2, RoundingMode.HALF_UP);
     }
 }

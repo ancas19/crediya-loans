@@ -39,7 +39,8 @@ public class CustomuserRepository {
                                 s.plazo AS TERM,
                                 s.identification AS IDENTIFICATION,
                                 e.descripcion AS STATE_NAME,
-                                tp.nombre AS LOAN_TYPE_NAME
+                                tp.nombre AS LOAN_TYPE_NAME,
+                                tp.tasa_interes AS INTEREST_RATE
                             from solicitud s
                             inner join estado e on s.id_estado=e.id
                             inner join tipo_prestamo tp on tp.id=s.tipo_prestamos
@@ -57,7 +58,9 @@ public class CustomuserRepository {
                         .term(row.get("TERM", Integer.class))
                         .identification(row.get("IDENTIFICATION",String.class))
                         .loanTypeName(row.get("LOAN_TYPE_NAME",String.class))
-                        .stateName(row.get("STATE_NAME", String.class)).build()
+                        .stateName(row.get("STATE_NAME", String.class))
+                        .interestRate(row.get("INTEREST_RATE", BigDecimal.class))
+                        .build()
                 ).all()
                 .collectList();
     }

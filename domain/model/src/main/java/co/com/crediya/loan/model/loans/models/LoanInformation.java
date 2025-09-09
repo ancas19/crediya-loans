@@ -17,6 +17,9 @@ public class LoanInformation {
     private String identification;
     private String loanTypeName;
     private String stateName;
+    private BigDecimal interestRate;
+    private BigDecimal baseSalary;
+    private BigDecimal monthlyDebt;
     private String email;
     private String names;
     private String lastNames;
