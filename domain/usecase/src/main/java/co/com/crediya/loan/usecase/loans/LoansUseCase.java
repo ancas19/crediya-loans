@@ -11,6 +11,7 @@ import co.com.crediya.loan.model.loantype.models.LoanType;
 import co.com.crediya.loan.model.state.models.State;
 import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
 import co.com.crediya.loan.model.userwebclient.models.UserDocument;
+import co.com.crediya.loan.model.userwebclient.models.UserIdentifications;
 import co.com.crediya.loan.model.userwebclient.models.UserInformation;
 import co.com.crediya.loan.usecase.loantype.LoanTypeUseCase;
 import co.com.crediya.loan.usecase.state.StateUseCase;
@@ -80,9 +81,8 @@ public class LoansUseCase {
         Set<String> identifications = loans.stream()
                 .map(LoanInformation::getIdentification)
                 .collect(Collectors.toSet());
-        return Flux.fromIterable(identifications)
-                .flatMap(identification -> userWebClientRepository.getUserInformation(new UserDocument(identification)))
-                .collectMap(UserInformation::getIdentification)
+        return userWebClientRepository.getUsersByInformation(new UserIdentifications(identifications))
+                .map(users -> users.stream().collect(Collectors.toMap(UserInformation::getIdentification, userInfo -> userInfo)))
                 .flatMap(userMap ->
                         Flux.fromIterable(loans)
                                 .map((LoanInformation loan) -> {

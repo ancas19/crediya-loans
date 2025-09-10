@@ -21,7 +21,8 @@ adapters:
 user:
   service:
     host: ${USER_SERVICE_HOST:localhost:8080}
-    uri: ${USER_SERVICE_URI:/api/v1/users}
+    uri-user: ${USER_SERVICE_URI:/api/v1/users}
+    uri-users: ${USERS_SERVICE_URI:/api/v1/users}
 
 
 jwt:

@@ -3,15 +3,19 @@ package co.com.crediya.loan.webclient.adapter;
 import co.com.crediya.loan.model.commons.exception.BadRequestException;
 import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
 import co.com.crediya.loan.model.userwebclient.models.UserDocument;
+import co.com.crediya.loan.model.userwebclient.models.UserIdentifications;
 import co.com.crediya.loan.model.userwebclient.models.UserInformation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static co.com.crediya.loan.model.commons.enums.Constants.AUTHORIZATION;
 import static co.com.crediya.loan.model.commons.enums.Constants.BEARER;
@@ -23,8 +27,10 @@ public class UserWebClientAdapter implements UserWebClientRepository {
     public static final Logger log = LoggerFactory.getLogger(UserWebClientAdapter.class);
     @Value("${user.service.host}")
     private String userServiceUrl;
-    @Value("${user.service.uri}")
+    @Value("${user.service.uri-user}")
     private String userServiceEndpoint;
+    @Value("${user.service.uri-users}")
+    private String usersServiceEndpoint;
     private final WebClient webClient;
 
     @Override
@@ -36,6 +42,21 @@ public class UserWebClientAdapter implements UserWebClientRepository {
                         .bodyValue(userDocument)
                         .retrieve()
                         .bodyToMono(UserInformation.class)
+                        .doOnSuccess(userInfo -> log.info("User information retrieved: {}", userInfo))
+                        .doOnError(error -> log.error("Error retrieving user information: {}", error.getMessage(), error))
+                        .onErrorResume(error -> Mono.error(new BadRequestException(ERROR_SEARCHING_USER_INFORMATION.getMessage())))
+                );
+    }
+
+    @Override
+    public Mono<List<UserInformation>> getUsersByInformation(UserIdentifications userDocument) {
+        return this.getCurrentToken()
+                .flatMap(token -> webClient.post()
+                        .uri(userServiceUrl + usersServiceEndpoint)
+                        .header(HttpHeaders.AUTHORIZATION, BEARER.getValue()+(token))
+                        .bodyValue(userDocument)
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<List<UserInformation>>() {})
                         .doOnSuccess(userInfo -> log.info("User information retrieved: {}", userInfo))
                         .doOnError(error -> log.error("Error retrieving user information: {}", error.getMessage(), error))
                         .onErrorResume(error -> Mono.error(new BadRequestException(ERROR_SEARCHING_USER_INFORMATION.getMessage())))
