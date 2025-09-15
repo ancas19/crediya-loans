@@ -3,8 +3,9 @@ package co.com.crediya.loan.model.commons.enums;
 public enum Constants {
 
     PENDING("PENDIENTE"),
+    APPROVED("APROBADO"),
+    REJECTED("RECHAZADO"),
     AUTHORIZATION("Authorization"),
-    INACTIVE("INACTIVE"),
     ROLE("ROLE_%s"),
     CALIM_IDENTIFICATION("IDENTIFICATION"),
     CLAIM_ROLE("ROLE"),

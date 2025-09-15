@@ -21,6 +21,7 @@ public class LoanRouterRest {
         return RouterFunctions.route()
                 .POST("/solicitud",loansHandler::createLoan)
                 .POST("/solicitud/detalles",loansHandler::searchLoans)
+                .PUT("/solicitud/estado",loansHandler::updateLoanState)
                 .build();
     }
 }

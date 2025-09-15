@@ -3,16 +3,14 @@ package co.com.crediya.loan.usecase.loans;
 import co.com.crediya.loan.model.commons.enums.ErrorMessages;
 import co.com.crediya.loan.model.commons.exception.NotFoundException;
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
-import co.com.crediya.loan.model.loans.models.LoanInformation;
-import co.com.crediya.loan.model.loans.models.LoanSearch;
-import co.com.crediya.loan.model.loans.models.Loans;
-import co.com.crediya.loan.model.loans.models.LoansPaginated;
+import co.com.crediya.loan.model.loans.models.*;
 import co.com.crediya.loan.model.loantype.models.LoanType;
 import co.com.crediya.loan.model.state.models.State;
 import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
 import co.com.crediya.loan.model.userwebclient.models.UserDocument;
 import co.com.crediya.loan.model.userwebclient.models.UserIdentifications;
 import co.com.crediya.loan.model.userwebclient.models.UserInformation;
+import co.com.crediya.loan.usecase.emailnotification.EmailNotificationUseCase;
 import co.com.crediya.loan.usecase.loantype.LoanTypeUseCase;
 import co.com.crediya.loan.usecase.state.StateUseCase;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +22,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static co.com.crediya.loan.model.commons.enums.Constants.PENDING;
@@ -31,6 +30,7 @@ import static co.com.crediya.loan.model.commons.enums.Constants.PENDING;
 
 @RequiredArgsConstructor
 public class LoansUseCase {
+    private final EmailNotificationUseCase emailNotificationUseCase;
     private final UserWebClientRepository userWebClientRepository;
     private final LoansRepositoryPort loansRepositoryPort;
     private final LoanTypeUseCase loanTypeUseCase;
@@ -62,6 +62,28 @@ public class LoansUseCase {
     public Mono<LoansPaginated> searchLoans(LoanSearch loanSearch) {
         return this.loansRepositoryPort.searchLoans(loanSearch)
                 .flatMap(this::processData);
+    }
+
+
+    public Mono<Loans> updateLoanState(LoansStates loansStates) {
+        return this.findById(loansStates.getId())
+                .flatMap(loanFound -> this.stateUseCase.findByName(loansStates.getSatateName())
+                        .flatMap(state -> {
+                                    loanFound.setStateId(state.getId());
+                                    return this.loansRepositoryPort.createLoan(loanFound);
+                                }
+                        )
+                        .flatMap(savedLoan ->
+                                this.emailNotificationUseCase.sendEmailNotification(savedLoan)
+                                        .thenReturn(savedLoan)
+                        )
+
+                );
+    }
+
+    public Mono<Loans> findById(UUID id) {
+        return this.loansRepositoryPort.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.ERROR_MESSAGE_LOAN_NOT_FOUND.getMessage().formatted(id))));
     }
 
     private Mono<LoansPaginated> processData(LoansPaginated loansPaginated) {

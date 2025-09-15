@@ -6,6 +6,7 @@ import co.com.crediya.loan.api.utils.Mapper;
 import co.com.crediya.loan.model.commons.gateways.CurrentUserPort;
 import co.com.crediya.loan.model.loans.models.LoanSearch;
 import co.com.crediya.loan.model.loans.models.Loans;
+import co.com.crediya.loan.model.loans.models.LoansStates;
 import co.com.crediya.loan.usecase.loans.LoansUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,4 +49,10 @@ public class LoansAppService {
                 .map(Mapper::toLoanPagiantionResponse);
     }
 
+
+    @Transactional("r2dbcTransactionManager")
+    public Mono<LoanResponse> updateLoan(LoansStates loansStates){
+        return loansUseCase.updateLoanState(loansStates)
+                .map(Mapper::toResponse);
+    }
 }

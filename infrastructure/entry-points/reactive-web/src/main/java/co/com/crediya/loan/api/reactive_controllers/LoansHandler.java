@@ -2,6 +2,7 @@ package co.com.crediya.loan.api.reactive_controllers;
 
 import co.com.crediya.loan.api.request.LoanRequest;
 import co.com.crediya.loan.api.request.LoanSearchRequest;
+import co.com.crediya.loan.api.request.LoanStateRequest;
 import co.com.crediya.loan.api.services.LoansAppService;
 import co.com.crediya.loan.api.utils.Mapper;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,16 @@ public class LoansHandler {
                         .bodyValue(loanPaginationResponse)
                 );
 
+    }
+
+    public Mono<ServerResponse> updateLoanState(ServerRequest request){
+        return request.bodyToMono(LoanStateRequest.class)
+                .map(Mapper::toLoanStateModel)
+                .flatMap(loansAppService::updateLoan)
+                .flatMap(loanResponse -> ServerResponse
+                        .status(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(loanResponse)
+                );
     }
 }

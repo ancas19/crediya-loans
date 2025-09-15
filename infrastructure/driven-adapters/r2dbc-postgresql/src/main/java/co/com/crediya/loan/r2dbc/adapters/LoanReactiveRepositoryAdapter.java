@@ -34,4 +34,10 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
     public Mono<LoansPaginated> searchLoans(LoanSearch loanSearch) {
         return this.customuserRepository.searchLoans(loanSearch);
     }
+
+    @Override
+    public Mono<Loans> findById(UUID id) {
+        return this.repository.findById(id)
+                .map(loanFound -> mapper.map(loanFound, Loans.class));
+    }
 }

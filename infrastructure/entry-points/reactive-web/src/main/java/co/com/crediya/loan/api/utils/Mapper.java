@@ -3,12 +3,10 @@ package co.com.crediya.loan.api.utils;
 
 import co.com.crediya.loan.api.request.LoanRequest;
 import co.com.crediya.loan.api.request.LoanSearchRequest;
+import co.com.crediya.loan.api.request.LoanStateRequest;
 import co.com.crediya.loan.api.response.LoanResponse;
 import co.com.crediya.loan.api.response.LoansPaginatedResponse;
-import co.com.crediya.loan.model.loans.models.LoanInformation;
-import co.com.crediya.loan.model.loans.models.LoanSearch;
-import co.com.crediya.loan.model.loans.models.Loans;
-import co.com.crediya.loan.model.loans.models.LoansPaginated;
+import co.com.crediya.loan.model.loans.models.*;
 
 import java.util.List;
 
@@ -50,6 +48,13 @@ public class Mapper {
                 .size(loansPaginated.getSize())
                 .loansQuantity(loansPaginated.getLoansQuantity())
                 .loans(loansPaginated.getLoans())
+                .build();
+    }
+
+    public static LoansStates toLoanStateModel(LoanStateRequest loanStateRequest) {
+        return LoansStates.builder()
+                .id(loanStateRequest.getId())
+                .satateName(loanStateRequest.getStateName())
                 .build();
     }
 }

@@ -1,34 +1,30 @@
 server:
-  port: ${PORT:8080}
+  port: "${PORT:8080}"
 spring:
   application:
     name: "UsersCrediya"
   webflux:
-    base-path: ${CONTEXT_PATH}
+    base-path: "${CONTEXT_PATH}"
 adapters:
   r2dbc:
-    host: ${R2DBC_HOST:localhost}
-    port: ${R2DBC_PORT:5432}
-    database: ${R2DBC_DATABASE:mydb}
-    schema: ${R2DBC_SCHEMA:public}
-    username: ${R2DBC_USERNAME:myuser}
-    password: ${R2DBC_PASSWORD:mypass}
-    poolSize: ${R2DBC_POOLSIZE:5}
-    maxSize: ${R2DBC_MAXSIZE:20}
-    maxIdleTime: ${R2DBC_MAXIDLETIME:10}
-    validationQuery: ${R2DBC_VALIDATIONQUERY:SELECT 1}
-
+    host: "${R2DBC_HOST:localhost}"
+    port: "${R2DBC_PORT:5432}"
+    database: "${R2DBC_DATABASE:mydb}"
+    schema: "${R2DBC_SCHEMA:public}"
+    username: "${R2DBC_USERNAME:myuser}"
+    password: "${R2DBC_PASSWORD:mypass}"
+    poolSize: "${R2DBC_POOLSIZE:5}"
+    maxSize: "${R2DBC_MAXSIZE:20}"
+    maxIdleTime: "${R2DBC_MAXIDLETIME:10}"
+    validationQuery: "${R2DBC_VALIDATIONQUERY:SELECT 1}"
 user:
   service:
-    host: ${USER_SERVICE_HOST:localhost:8080}
-    uri-user: ${USER_SERVICE_URI:/api/v1/users}
-    uri-users: ${USERS_SERVICE_URI:/api/v1/users}
-
-
+    host: "${USER_SERVICE_HOST:localhost:8080}"
+    uri-user: "${USER_SERVICE_URI:/api/v1/users}"
+    uri-users: "${USERS_SERVICE_URI:/api/v1/users}"
 jwt:
-  secret: ${JWT_SECRET:secret}
-  expiration: ${JWT_TIME:8}
-
+  secret: "${JWT_SECRET:secret}"
+  expiration: "${JWT_TIME:8}"
 management:
   endpoints:
     web:
@@ -40,14 +36,18 @@ management:
         enabled: true
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
-
 security:
   public-paths:
-    - POST:/api/v1.0/auth/login
-
+  - "POST:/api/v1.0/auth/login"
 logging:
   level:
-    reactor.netty: DEBUG
-    org.springframework.data.r2dbc: DEBUG
-    io.r2dbc.postgresql.QUERY: DEBUG
-    root: INFO
+    reactor.netty: "DEBUG"
+    org.springframework.data.r2dbc: "DEBUG"
+    io.r2dbc.postgresql.QUERY: "DEBUG"
+    root: "INFO"
+
+adapter:
+  sqs:
+    region: "us-east-1"
+    queueUrl: "https:"
+    endpoint: "http://localhost:4566"
