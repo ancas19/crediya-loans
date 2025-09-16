@@ -1,9 +1,7 @@
 package co.com.crediya.loan.r2dbc.adapters;
 
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
-import co.com.crediya.loan.model.loans.models.LoanSearch;
-import co.com.crediya.loan.model.loans.models.Loans;
-import co.com.crediya.loan.model.loans.models.LoansPaginated;
+import co.com.crediya.loan.model.loans.models.*;
 import co.com.crediya.loan.r2dbc.custom_repositories.CustomuserRepository;
 import co.com.crediya.loan.r2dbc.entity.LoansEntity;
 import co.com.crediya.loan.r2dbc.helper.ReactiveAdapterOperations;
@@ -39,5 +37,10 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
     public Mono<Loans> findById(UUID id) {
         return this.repository.findById(id)
                 .map(loanFound -> mapper.map(loanFound, Loans.class));
+    }
+
+    @Override
+    public Mono<LoanNotificationInformation> findLoanInformationById(UUID id) {
+        return this.customuserRepository.findLoanInformationById(id);
     }
 }

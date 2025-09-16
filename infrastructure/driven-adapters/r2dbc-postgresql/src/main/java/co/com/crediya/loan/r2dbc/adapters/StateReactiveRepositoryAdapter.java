@@ -22,4 +22,10 @@ public class StateReactiveRepositoryAdapter extends ReactiveAdapterOperations<St
         return this.repository.findByName(name)
                 .map(stateEntity -> mapper.map(stateEntity, State.class));
     }
+
+    @Override
+    public Mono<State> findById(UUID id) {
+        return this.repository.findById(id)
+                .map(stateEntity -> mapper.map(stateEntity, State.class));
+    }
 }

@@ -8,8 +8,6 @@ import co.com.crediya.loan.api.response.LoanResponse;
 import co.com.crediya.loan.api.response.LoansPaginatedResponse;
 import co.com.crediya.loan.model.loans.models.*;
 
-import java.util.List;
-
 public class Mapper {
 
     public static Loans toLoanModel(LoanRequest loanRequest){
@@ -51,8 +49,8 @@ public class Mapper {
                 .build();
     }
 
-    public static LoansStates toLoanStateModel(LoanStateRequest loanStateRequest) {
-        return LoansStates.builder()
+    public static LoansStatus toLoanStateModel(LoanStateRequest loanStateRequest) {
+        return LoansStatus.builder()
                 .id(loanStateRequest.getId())
                 .satateName(loanStateRequest.getStateName())
                 .build();

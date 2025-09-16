@@ -1,6 +1,7 @@
 package co.com.crediya.loan.r2dbc.custom_repositories;
 
 import co.com.crediya.loan.model.loans.models.LoanInformation;
+import co.com.crediya.loan.model.loans.models.LoanNotificationInformation;
 import co.com.crediya.loan.model.loans.models.LoanSearch;
 import co.com.crediya.loan.model.loans.models.LoansPaginated;
 import lombok.RequiredArgsConstructor;
@@ -78,5 +79,34 @@ public class CustomuserRepository {
                 .bind("state", "%%%s%%".formatted(loanSearch.getState()))
                 .map(row -> row.get(0, Long.class).intValue())
                 .one();
+    }
+
+    public Mono<LoanNotificationInformation> findLoanInformationById(UUID id) {
+        return databaseClient.sql(
+                """
+                select
+                    s.id AS ID,
+                    s.monto AS AMOUNT,
+                    s.plazo AS TERM,
+                    s.identification AS IDENTIFICATION,
+                    e.descripcion AS STATE_NAME,
+                    tp.nombre AS LOAN_TYPE_NAME,
+                    tp.tasa_interes AS INTEREST_RATE
+                from solicitud s
+                inner join estado e on s.id_estado=e.id
+                inner join tipo_prestamo tp on tp.id=s.tipo_prestamos
+                where s.id = :id
+                """
+        ).bind("id", id)
+                .map((row, meta) -> LoanNotificationInformation.builder()
+                        .id(row.get("ID", UUID.class))
+                        .amount(row.get("AMOUNT", BigDecimal.class))
+                        .term(row.get("TERM", Integer.class))
+                        .identification(row.get("IDENTIFICATION", String.class))
+                        .loanType(row.get("LOAN_TYPE_NAME", String.class))
+                        .status(row.get("STATE_NAME", String.class))
+                        .interest(row.get("INTEREST_RATE", BigDecimal.class))
+                        .build()
+                ).one();
     }
 }
