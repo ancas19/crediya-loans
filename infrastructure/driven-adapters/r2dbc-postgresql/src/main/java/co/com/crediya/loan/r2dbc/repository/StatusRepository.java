@@ -1,13 +1,13 @@
 package co.com.crediya.loan.r2dbc.repository;
 
 
-import co.com.crediya.loan.r2dbc.entity.StateEntity;
+import co.com.crediya.loan.r2dbc.entity.StatusEntity;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface StateRepository extends ReactiveCrudRepository<StateEntity, UUID>, ReactiveQueryByExampleExecutor<StateEntity> {
-    Mono<StateEntity> findByName(String name);
+public interface StatusRepository extends ReactiveCrudRepository<StatusEntity, UUID>, ReactiveQueryByExampleExecutor<StatusEntity> {
+    Mono<StatusEntity> findByName(String name);
 }

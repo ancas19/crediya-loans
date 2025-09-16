@@ -6,14 +6,14 @@ import co.com.crediya.loan.model.commons.exception.NotFoundException;
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
 import co.com.crediya.loan.model.loans.models.*;
 import co.com.crediya.loan.model.loantype.models.LoanType;
-import co.com.crediya.loan.model.state.models.State;
+import co.com.crediya.loan.model.status.models.Status;
 import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
 import co.com.crediya.loan.model.userwebclient.models.UserDocument;
 import co.com.crediya.loan.model.userwebclient.models.UserIdentifications;
 import co.com.crediya.loan.model.userwebclient.models.UserInformation;
 import co.com.crediya.loan.usecase.emailnotification.EmailNotificationUseCase;
 import co.com.crediya.loan.usecase.loantype.LoanTypeUseCase;
-import co.com.crediya.loan.usecase.state.StateUseCase;
+import co.com.crediya.loan.usecase.status.StatusUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +37,7 @@ public class LoansUseCase {
     private final UserWebClientRepository userWebClientRepository;
     private final LoansRepositoryPort loansRepositoryPort;
     private final LoanTypeUseCase loanTypeUseCase;
-    private final StateUseCase stateUseCase;
+    private final StatusUseCase statusUseCase;
 
     public Mono<Loans> creteLoan(Loans loanInformation) {
         return userWebClientRepository.getUserInformation(new UserDocument(loanInformation.getIdentification()))
@@ -45,17 +45,17 @@ public class LoansUseCase {
                 .flatMap(userInfo ->
                         Mono.zip(
                                 loanTypeUseCase.findByName(loanInformation.getLoanTypeName()),
-                                stateUseCase.findByName(PENDING.getValue())
+                                statusUseCase.findByName(PENDING.getValue())
                         )
                 ).flatMap(tuple -> {
                     LoanType loanType = tuple.getT1();
-                    State state = tuple.getT2();
+                    Status status = tuple.getT2();
                     loanInformation.setLoanTypeId(loanType.getId());
-                    loanInformation.setStateId(state.getId());
+                    loanInformation.setStateId(status.getId());
                     return loansRepositoryPort.createLoan(loanInformation)
                             .map(savedLoan -> {
                                 savedLoan.setLoanTypeName(loanType.getName());
-                                savedLoan.setStateName(state.getDescription());
+                                savedLoan.setStateName(status.getDescription());
                                 savedLoan.setIdentification(loanInformation.getIdentification());
                                 return savedLoan;
                             });
@@ -71,7 +71,7 @@ public class LoansUseCase {
     public Mono<Loans> updateLoanState(LoansStatus loansStatus) {
         return this.findById(loansStatus.getId())
                 .flatMap(this::verifyStatus)
-                .flatMap(loanFound -> this.stateUseCase.findByName(loansStatus.getSatateName())
+                .flatMap(loanFound -> this.statusUseCase.findByName(loansStatus.getSatateName())
                         .map(state -> {
                                     loanFound.setStateId(state.getId());
                                     return loanFound;
@@ -131,7 +131,7 @@ public class LoansUseCase {
     }
 
     private Mono<Loans> verifyStatus(Loans loandInformation){
-       return this.stateUseCase.findById(loandInformation.getStateId())
+       return this.statusUseCase.findById(loandInformation.getStateId())
                 .flatMap(
                         status -> {
                             if (!status.getName().equals(PENDING.getValue())) {

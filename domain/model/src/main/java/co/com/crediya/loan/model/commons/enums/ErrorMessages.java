@@ -10,7 +10,8 @@ public enum ErrorMessages {
     ERROR_MESSAGE_LOANS_NOT_FOUND("Loans not found"),
     ERROR_MESSAGE_LOAN_NOT_FOUND("Loan with id %s not found"),
     ERROR_STATE_ID_NOT_FOUND("State with id %s not found"),
-    ERROR_MESSAGE_LOAN_STATE_CANNOT_BE_UPDATED("The loan state cannot be updated because it is not  in pending state"),;
+    ERROR_MESSAGE_LOAN_STATE_CANNOT_BE_UPDATED("The loan state cannot be updated because it is not  in pending state"),
+    ERROR_MESSAGE_TEMPLATE_NOT_FOUND("Template with name %s not found"),;
     private final String message;
 
     ErrorMessages(String message){

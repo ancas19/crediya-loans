@@ -9,7 +9,18 @@ public enum Constants {
     ROLE("ROLE_%s"),
     CALIM_IDENTIFICATION("IDENTIFICATION"),
     CLAIM_ROLE("ROLE"),
-    BEARER("Bearer ");
+    BEARER("Bearer "),
+    TABLE_LOAN_CONTENT(
+            """
+                    <tr th:each="payment">
+                      <td style="padding:8px;font-size:13px;border:1px solid #e6eef0;">%s</td>
+                      <td style="padding:8px;font-size:13px;border:1px solid #e6eef0;">%s</td>
+                      <td style="padding:8px;font-size:13px;border:1px solid #e6eef0;">%s</td>
+                      <td style="padding:8px;font-size:13px;border:1px solid #e6eef0;">%s</td>
+                      <td style="padding:8px;font-size:13px;border:1px solid #e6eef0;">%s</td>
+                    </tr>
+                  """
+    );
 
     private final String value;
 

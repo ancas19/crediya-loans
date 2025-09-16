@@ -42,3 +42,18 @@ CREATE INDEX idx_tipo_prestamo_nombre ON tipo_prestamo(nombre);
 CREATE INDEX idx_solicitud_id_estado ON solicitud(id_estado);
 CREATE INDEX idx_solicitud_tipo_prestamos ON solicitud(tipo_prestamos);
 CREATE INDEX idx_solicitud_identification ON solicitud(identification);
+
+
+CREATE TABLE correos_mensaje (
+    id UUID  PRIMARY KEY DEFAULT gen_random_uuid(),
+    nombre VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    u_creacion VARCHAR,
+    u_actualizacion VARCHAR,
+    f_creacion TIMESTAMP,
+    f_actualizacion TIMESTAMP
+);
+
+CREATE INDEX idx_correos_mensaje_subject ON correos_mensaje(subject);
+CREATE INDEX idx_correos_mensaje_nombre ON correos_mensaje(nombre);

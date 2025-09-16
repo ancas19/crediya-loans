@@ -14,15 +14,17 @@ import java.util.UUID;
 @Getter
 @Setter
 @SuperBuilder
-@Table(name="estado")
+@Table(name="correos_mensaje")
 @NoArgsConstructor
 @AllArgsConstructor
-public class StateEntity extends AbstractAuditoriaEntity{
+public class TemplateEntity extends AbstractAuditoriaEntity{
     @Id
     @Column("id")
     private UUID id;
-    @Column("name")
+    @Column("nombre")
     private String name;
-    @Column("descripcion")
-    private String description;
+    @Column("subject")
+    private String subject;
+    @Column("content")
+    private String content;
 }
