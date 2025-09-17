@@ -45,9 +45,18 @@ logging:
     org.springframework.data.r2dbc: "DEBUG"
     io.r2dbc.postgresql.QUERY: "DEBUG"
     root: "INFO"
-
 adapter:
   sqs:
-    region: ${AWS_REGION:us-east-1}
-    queueUrl: ${AWS_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}
-    endpoint: ${AWS_SQS_ENDPOINT:http://localhost:4566}
+    region: "${AWS_REGION:us-east-1}"
+    queueUrl: "${AWS_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}"
+    endpoint: "${AWS_SQS_ENDPOINT:http://localhost:4566"
+
+entrypoint:
+  sqs:
+    region: "us-east-1"
+    endpoint: "http://localhost:4566"
+    queueUrl: ""
+    waitTimeSeconds: 20
+    maxNumberOfMessages: 10
+    visibilityTimeoutSeconds: 10
+    numberOfThreads: 1
