@@ -89,7 +89,8 @@ public class CustomuserRepository {
                     s.monto AS AMOUNT,
                     s.plazo AS TERM,
                     s.identification AS IDENTIFICATION,
-                    e.descripcion AS STATE_NAME,
+                    e.descripcion AS STATUS,
+                    e.name AS STATUS_NAME,
                     tp.nombre AS LOAN_TYPE_NAME,
                     tp.tasa_interes AS INTEREST_RATE
                 from solicitud s
@@ -104,7 +105,8 @@ public class CustomuserRepository {
                         .term(row.get("TERM", Integer.class))
                         .identification(row.get("IDENTIFICATION", String.class))
                         .loanType(row.get("LOAN_TYPE_NAME", String.class))
-                        .status(row.get("STATE_NAME", String.class))
+                        .status(row.get("STATUS_NAME", String.class))
+                        .statusDescription(row.get("STATUS", String.class))
                         .interest(row.get("INTEREST_RATE", BigDecimal.class))
                         .build()
                 ).one();

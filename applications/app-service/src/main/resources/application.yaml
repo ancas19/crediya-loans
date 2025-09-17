@@ -48,6 +48,6 @@ logging:
 
 adapter:
   sqs:
-    region: "us-east-1"
-    queueUrl: "https:"
-    endpoint: "http://localhost:4566"
+    region: ${AWS_REGION:us-east-1}
+    queueUrl: ${AWS_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}
+    endpoint: ${AWS_SQS_ENDPOINT:http://localhost:4566}

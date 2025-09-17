@@ -20,6 +20,7 @@ public class LoanNotificationInformation {
     private BigDecimal amount;
     private Integer term;
     private String status;
+    private String statusDescription;
     private String loanType;
     private String email;
     private BigDecimal monthlyPayment;

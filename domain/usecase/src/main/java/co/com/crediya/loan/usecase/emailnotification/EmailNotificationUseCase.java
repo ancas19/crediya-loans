@@ -28,10 +28,8 @@ public class EmailNotificationUseCase {
                 .flatMap(emailNotification -> this.emailNotificationPort.sendEmailNotification(
                                 EmailNotification.builder()
                                         .to(loanNotificationInformation.getEmail())
-                                        .subject("Loan Application Received")
-                                        .body(
-                                                "Dear %s %s,\n\n".formatted(loanNotificationInformation.getNames(), loanNotificationInformation.getLastName())
-                                        )
+                                        .subject(emailNotification.getSubject())
+                                        .body(emailNotification.getBody())
                                         .build()
                         )
                 );
