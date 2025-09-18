@@ -10,6 +10,7 @@ public enum Constants {
     CALIM_IDENTIFICATION("IDENTIFICATION"),
     CLAIM_ROLE("ROLE"),
     BEARER("Bearer "),
+    YES("SI"),
     TABLE_LOAN_CONTENT(
             """
                     <tr th:each="payment">

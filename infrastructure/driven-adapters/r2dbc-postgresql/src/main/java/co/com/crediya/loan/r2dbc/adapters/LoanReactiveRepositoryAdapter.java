@@ -2,6 +2,7 @@ package co.com.crediya.loan.r2dbc.adapters;
 
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
 import co.com.crediya.loan.model.loans.models.*;
+import co.com.crediya.loan.model.queuenotification.models.LoansApproved;
 import co.com.crediya.loan.r2dbc.custom_repositories.CustomuserRepository;
 import co.com.crediya.loan.r2dbc.entity.LoansEntity;
 import co.com.crediya.loan.r2dbc.helper.ReactiveAdapterOperations;
@@ -9,6 +10,7 @@ import co.com.crediya.loan.r2dbc.repository.LoansRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,5 +44,10 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
     @Override
     public Mono<LoanNotificationInformation> findLoanInformationById(UUID id) {
         return this.customuserRepository.findLoanInformationById(id);
+    }
+
+    @Override
+    public Mono<List<LoansApproved>> findApprovedLoansByClientId(String identification) {
+        return this.customuserRepository.findApprovedLoansByClientId(identification);
     }
 }

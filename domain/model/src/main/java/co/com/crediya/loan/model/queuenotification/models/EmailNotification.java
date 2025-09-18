@@ -1,4 +1,4 @@
-package co.com.crediya.loan.model.emailnotification.models;
+package co.com.crediya.loan.model.queuenotification.models;
 import lombok.*;
 
 

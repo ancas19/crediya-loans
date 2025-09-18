@@ -1,8 +1,10 @@
 package co.com.crediya.loan.model.loans.gateways;
 
 import co.com.crediya.loan.model.loans.models.*;
+import co.com.crediya.loan.model.queuenotification.models.LoansApproved;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface LoansRepositoryPort {
@@ -10,4 +12,5 @@ public interface LoansRepositoryPort {
     Mono<LoansPaginated> searchLoans(LoanSearch loanSearch);
     Mono<Loans> findById(UUID id);
     Mono<LoanNotificationInformation> findLoanInformationById(UUID id);
+    Mono<List<LoansApproved>> findApprovedLoansByClientId(String identification);
 }

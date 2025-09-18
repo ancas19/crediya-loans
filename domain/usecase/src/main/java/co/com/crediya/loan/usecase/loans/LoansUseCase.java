@@ -6,12 +6,14 @@ import co.com.crediya.loan.model.commons.exception.NotFoundException;
 import co.com.crediya.loan.model.loans.gateways.LoansRepositoryPort;
 import co.com.crediya.loan.model.loans.models.*;
 import co.com.crediya.loan.model.loantype.models.LoanType;
+import co.com.crediya.loan.model.queuenotification.models.CapacityCalculation;
+import co.com.crediya.loan.model.queuenotification.models.LoansApproved;
 import co.com.crediya.loan.model.status.models.Status;
 import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
 import co.com.crediya.loan.model.userwebclient.models.UserDocument;
 import co.com.crediya.loan.model.userwebclient.models.UserIdentifications;
 import co.com.crediya.loan.model.userwebclient.models.UserInformation;
-import co.com.crediya.loan.usecase.emailnotification.EmailNotificationUseCase;
+import co.com.crediya.loan.usecase.queuenotification.QueueNotificationUseCase;
 import co.com.crediya.loan.usecase.loantype.LoanTypeUseCase;
 import co.com.crediya.loan.usecase.status.StatusUseCase;
 import lombok.RequiredArgsConstructor;
@@ -27,46 +29,33 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static co.com.crediya.loan.model.commons.enums.Constants.APPROVED;
-import static co.com.crediya.loan.model.commons.enums.Constants.PENDING;
+import static co.com.crediya.loan.model.commons.enums.Constants.*;
 
 
 @RequiredArgsConstructor
 public class LoansUseCase {
-    private final EmailNotificationUseCase emailNotificationUseCase;
+    private final QueueNotificationUseCase queueNotificationUseCase;
     private final UserWebClientRepository userWebClientRepository;
     private final LoansRepositoryPort loansRepositoryPort;
     private final LoanTypeUseCase loanTypeUseCase;
     private final StatusUseCase statusUseCase;
 
     public Mono<Loans> creteLoan(Loans loanInformation) {
-        return userWebClientRepository.getUserInformation(new UserDocument(loanInformation.getIdentification()))
-                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.ERROR_MESSAGE_USER_NOT_FOUND.getMessage().formatted(loanInformation.getIdentification()))))
-                .flatMap(userInfo ->
-                        Mono.zip(
-                                loanTypeUseCase.findByName(loanInformation.getLoanTypeName()),
-                                statusUseCase.findByName(PENDING.getValue())
-                        )
-                ).flatMap(tuple -> {
-                    LoanType loanType = tuple.getT1();
-                    Status status = tuple.getT2();
-                    loanInformation.setLoanTypeId(loanType.getId());
-                    loanInformation.setStateId(status.getId());
-                    return loansRepositoryPort.createLoan(loanInformation)
-                            .map(savedLoan -> {
-                                savedLoan.setLoanTypeName(loanType.getName());
-                                savedLoan.setStateName(status.getDescription());
-                                savedLoan.setIdentification(loanInformation.getIdentification());
-                                return savedLoan;
-                            });
-                });
+        Mono<UserInformation> userInformationFound = this.userWebClientRepository.getUserInformation(new UserDocument(loanInformation.getIdentification()))
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.ERROR_MESSAGE_USER_NOT_FOUND.getMessage().formatted(loanInformation.getIdentification()))));
+        Mono<LoanType> loanTypeFound = loanTypeUseCase.findByName(loanInformation.getLoanTypeName());
+        Mono<Status> statusFound = statusUseCase.findByName(PENDING.getValue());
+        return userInformationFound.flatMap(userInformation -> Mono.zip(loanTypeFound, statusFound)
+                .flatMap(tuple -> this.handleLoanCreation(tuple.getT1(), tuple.getT2(), loanInformation, userInformation))
+        );
+
+
     }
 
     public Mono<LoansPaginated> searchLoans(LoanSearch loanSearch) {
         return this.loansRepositoryPort.searchLoans(loanSearch)
                 .flatMap(this::processData);
     }
-
 
     public Mono<Loans> updateLoanState(LoansStatus loansStatus) {
         return this.findById(loansStatus.getId())
@@ -94,7 +83,7 @@ public class LoansUseCase {
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.ERROR_MESSAGE_LOAN_NOT_FOUND.getMessage().formatted(id))));
     }
 
-    private Mono<Loans> processLoanAnsSendNotification(Loans savedLoan){
+    private Mono<Loans> processLoanAnsSendNotification(Loans savedLoan) {
         Mono<UserInformation> userFound = this.userWebClientRepository.getUserInformation(new UserDocument(savedLoan.getIdentification()));
         Mono<LoanNotificationInformation> loanFound = this.loansRepositoryPort.findLoanInformationById(savedLoan.getId());
         return Mono.zip(userFound, loanFound)
@@ -105,17 +94,34 @@ public class LoansUseCase {
                             loanInformationFound.setLastName(userInformation.getLastName());
                             loanInformationFound.setEmail(userInformation.getEmail());
                             loanInformationFound.setMonthlyPayment(monthlyPayment(loanInformationFound.getAmount(), loanInformationFound.getInterest(), loanInformationFound.getTerm()));
-                            if(loanInformationFound.getStatus().equals(APPROVED.getValue())){
+                            if (loanInformationFound.getStatus().equals(APPROVED.getValue())) {
                                 loanInformationFound.setPayments(calculatePayments(loanInformationFound));
                             }
                             return Mono.just(loanInformationFound);
                         }
                 ).flatMap(
-                        loanInformationToSend -> emailNotificationUseCase.sendEmailNotification(loanInformationToSend)
+                        loanInformationToSend -> queueNotificationUseCase.sendEmailNotification(loanInformationToSend)
                                 .thenReturn(savedLoan)
                 );
     }
 
+
+    private Mono<Loans> handleLoanCreation(LoanType loanType, Status status, Loans loanInformation, UserInformation userInformation) {
+        loanInformation.setLoanTypeId(loanType.getId());
+        loanInformation.setStateId(status.getId());
+        if (!loanType.getAutoValidation().equals(YES.getValue())) {
+            return this.loansRepositoryPort.createLoan(loanInformation)
+                    .map(savedLoan -> addLoanInformation(loanInformation, savedLoan, loanType, status));
+        }
+
+        return this.loansRepositoryPort.createLoan(loanInformation)
+                .flatMap(loanSaved -> this.loansRepositoryPort.findApprovedLoansByClientId(loanInformation.getIdentification())
+                        .defaultIfEmpty(new ArrayList<>())
+                        .flatMap(loansApproved -> buildCapacityCalculation(loansApproved, userInformation, loanType, loanSaved))
+                        .thenReturn(loanSaved)
+
+                );
+    }
 
     private Mono<LoansPaginated> processData(LoansPaginated loansPaginated) {
         if (loansPaginated.getLoans().isEmpty()) {
@@ -130,8 +136,8 @@ public class LoansUseCase {
                         .build());
     }
 
-    private Mono<Loans> verifyStatus(Loans loandInformation){
-       return this.statusUseCase.findById(loandInformation.getStateId())
+    private Mono<Loans> verifyStatus(Loans loandInformation) {
+        return this.statusUseCase.findById(loandInformation.getStateId())
                 .flatMap(
                         status -> {
                             if (!status.getName().equals(PENDING.getValue())) {
@@ -178,16 +184,16 @@ public class LoansUseCase {
     }
 
     private List<Payments> calculatePayments(LoanNotificationInformation loanInformationFound) {
-        List<Payments> paymentsList=new ArrayList<>();
-        BigDecimal monthlyPayment=loanInformationFound.getMonthlyPayment();
-        BigDecimal remainingBalance=loanInformationFound.getAmount();
+        List<Payments> paymentsList = new ArrayList<>();
+        BigDecimal monthlyPayment = loanInformationFound.getMonthlyPayment();
+        BigDecimal remainingBalance = loanInformationFound.getAmount();
         BigDecimal monthlyInterestRate = BigDecimal.valueOf(Math.pow(1 + loanInformationFound.getInterest().doubleValue() / 100, 1.0 / 12.0) - 1).setScale(6, RoundingMode.HALF_UP);
-        for (Integer numberpayment=1; numberpayment<=loanInformationFound.getTerm();numberpayment++){
+        for (Integer numberpayment = 1; numberpayment <= loanInformationFound.getTerm(); numberpayment++) {
             BigDecimal interestRaw = remainingBalance.multiply(monthlyInterestRate);
             BigDecimal principalRaw = monthlyPayment.subtract(interestRaw);
             BigDecimal interest = interestRaw.setScale(2, RoundingMode.HALF_UP);
             BigDecimal principal = principalRaw.setScale(2, RoundingMode.HALF_UP);
-            if(numberpayment.equals(loanInformationFound.getTerm())){
+            if (numberpayment.equals(loanInformationFound.getTerm())) {
                 BigDecimal finalInterest = remainingBalance.multiply(monthlyInterestRate).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal finalPayment = remainingBalance.add(finalInterest).setScale(2, RoundingMode.HALF_UP);
                 paymentsList.add(
@@ -212,6 +218,34 @@ public class LoansUseCase {
                             .build()
             );
         }
-        return  paymentsList;
+        return paymentsList;
+    }
+
+    private Loans addLoanInformation(Loans loanInformation, Loans savedLoan, LoanType loanType, Status status) {
+        savedLoan.setLoanTypeName(loanType.getName());
+        savedLoan.setStateName(status.getDescription());
+        savedLoan.setIdentification(loanInformation.getIdentification());
+        return savedLoan;
+    }
+
+    private Mono<CapacityCalculation> buildCapacityCalculation(List<LoansApproved> loansApproved, UserInformation userInformation, LoanType loanType, Loans savedLoan) {
+        return this.getCurrentToken()
+                .map(token -> CapacityCalculation.builder()
+                        .baseSalary(userInformation.getBaseSalary())
+                        .id(savedLoan.getId())
+                        .interest(loanType.getInterestRate())
+                        .term(savedLoan.getTerm())
+                        .amount(savedLoan.getAmount())
+                        .token(token)
+                        .loans(loansApproved)
+                        .build()
+                );
+    }
+
+    private Mono<String> getCurrentToken() {
+        return Mono.deferContextual(contextView ->
+                Mono.justOrEmpty(contextView.getOrEmpty(AUTHORIZATION.getValue()))
+                        .cast(String.class)
+        );
     }
 }

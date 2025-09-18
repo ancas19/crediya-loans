@@ -48,7 +48,8 @@ logging:
 adapter:
   sqs:
     region: "${AWS_REGION:us-east-1}"
-    queueUrl: "${AWS_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}"
+    queueUrlEmail: "${AWS_EMAIL_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}"
+    queueUrlCapacity: "${AWS_CAPACITY_SQS_QUEUE_URL:http://localhost:4566/000000000000/my-queue}"
     endpoint: "${AWS_SQS_ENDPOINT:http://localhost:4566"
 
 entrypoint:

@@ -1,12 +1,11 @@
-package co.com.crediya.loan.usecase.emailnotification;
+package co.com.crediya.loan.usecase.queuenotification;
 
-import co.com.crediya.loan.model.emailnotification.gateways.EmailNotificationPort;
-import co.com.crediya.loan.model.emailnotification.models.EmailNotification;
+import co.com.crediya.loan.model.queuenotification.gateways.QueueNotificationPort;
+import co.com.crediya.loan.model.queuenotification.models.CapacityCalculation;
+import co.com.crediya.loan.model.queuenotification.models.EmailNotification;
 import co.com.crediya.loan.model.loans.models.LoanNotificationInformation;
 import co.com.crediya.loan.model.loans.models.Payments;
 import co.com.crediya.loan.model.template.models.Template;
-import co.com.crediya.loan.model.userwebclient.gateways.UserWebClientRepository;
-import co.com.crediya.loan.model.userwebclient.models.UserDocument;
 import co.com.crediya.loan.usecase.template.TemplateUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -18,14 +17,14 @@ import static co.com.crediya.loan.model.commons.enums.Constants.TABLE_LOAN_CONTE
 
 
 @RequiredArgsConstructor
-public class EmailNotificationUseCase {
-    private final EmailNotificationPort emailNotificationPort;
+public class QueueNotificationUseCase {
+    private final QueueNotificationPort queueNotificationPort;
     private final TemplateUseCase templateUseCase;
 
     public Mono<Void> sendEmailNotification(LoanNotificationInformation loanNotificationInformation) {
         return templateUseCase.findByName(loanNotificationInformation.getStatus())
                 .flatMap(template -> buildEmailNotification(template, loanNotificationInformation))
-                .flatMap(emailNotification -> this.emailNotificationPort.sendEmailNotification(
+                .flatMap(emailNotification -> this.queueNotificationPort.sendEmailNotification(
                                 EmailNotification.builder()
                                         .to(loanNotificationInformation.getEmail())
                                         .subject(emailNotification.getSubject())
@@ -33,6 +32,11 @@ public class EmailNotificationUseCase {
                                         .build()
                         )
                 );
+    }
+
+    public Mono<Void> calculateCapacity(CapacityCalculation capacityCalculation) {
+        return this.queueNotificationPort.calculateCapacity(capacityCalculation);
+
     }
 
     private Mono<EmailNotification> buildEmailNotification(Template template, LoanNotificationInformation loanNotificationInformation) {
